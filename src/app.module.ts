@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './categories/category.module';
+import { ProductModule } from './products/product.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CategoryModule } from './categories/category.module';
       autoLoadEntities: true,
     }),
     CategoryModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],

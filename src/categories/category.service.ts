@@ -1,4 +1,9 @@
-import { Body, NotFoundException, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  ConflictException,
+  NotFoundException,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CreateCategoryDto } from './dto/create-categoy.dto';
@@ -46,12 +51,18 @@ export class CategoryService {
     return this.categoryRepository.save(category);
   }
   async remove(id: number) {
-    const category = await this.categoryRepository.findOne({
-      where: { id: +id },
-    });
-    if (!category) {
-      throw new NotFoundException(`Category #${id} not found for removal 1`);
+    try {
+      const category = await this.categoryRepository.findOneBy({ id });
+      if (!category) throw new NotFoundException(`Category #${id} not found`);
+
+      return await this.categoryRepository.remove(category);
+    } catch (err) {
+      if (err.code === '23503') {
+        throw new ConflictException(
+          'Cannot delete category with associated products',
+        );
+      }
+      throw err;
     }
-    return this.categoryRepository.remove(category);
   }
 }
